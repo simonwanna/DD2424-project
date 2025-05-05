@@ -1,2 +1,4 @@
 .git
 data
+checkpoints
+__pycache__
