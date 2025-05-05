@@ -1,0 +1,17 @@
+# --------  CUDA‑enabled PyTorch stack (compatible with driver 12.2)  --------
+--extra-index-url https://download.pytorch.org/whl/cu121
+
+# Linux/WSL – GPU
+torch==2.5.1+cu121          ; platform_system == "Linux"
+torchvision==0.20.1+cu121   ; platform_system == "Linux"
+torchaudio==2.5.1+cu121     ; platform_system == "Linux"
+
+# macOS – CPU / Apple Silicon
+torch==2.5.1                ; platform_system == "Darwin"
+torchvision==0.20.1         ; platform_system == "Darwin"
+torchaudio==2.5.1           ; platform_system == "Darwin"
+
+# Windows – CPU fallback
+torch==2.5.1+cpu            ; platform_system == "Windows"
+torchvision==0.20.1+cpu     ; platform_system == "Windows"
+torchaudio==2.5.1+cpu       ; platform_system == "Windows"

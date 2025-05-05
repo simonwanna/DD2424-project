@@ -1,0 +1,10 @@
+name: dd2424
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - nb_conda_kernels
+  - pip:
+      - -r requirements_torch.txt
+      - -r requirements.txt
