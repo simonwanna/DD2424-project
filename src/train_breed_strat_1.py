@@ -25,12 +25,7 @@ val_dataset   = ImageFolder(root=os.path.join(DATA_DIR, 'val'),   transform=tran
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True,  num_workers=4)
 val_loader   = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
-# Model setup
-weights = ResNet18_Weights.DEFAULT
-model = resnet18(weights=weights)
-model.fc = nn.Linear(model.fc.in_features, 37)
-
-
+ 
 def unfreeze_last_blocks(model, l):
     assert 0 <= l <= 4, "l must be in [0, 4]"
     layers = [model.layer1, model.layer2, model.layer3, model.layer4]
