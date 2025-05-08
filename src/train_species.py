@@ -5,6 +5,7 @@ from torchvision import transforms
 from torchvision.models import resnet18, ResNet18_Weights
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
+from torchsummary import summary
 
 
 DATA_DIR = 'data'
@@ -35,6 +36,10 @@ for param in model.parameters():
 for param in model.fc.parameters():  # unfreeze final layer
     param.requires_grad = True
 model = model.to(DEVICE)
+
+print(model)
+exit()
+
 
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(

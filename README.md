@@ -21,7 +21,7 @@ rm images.tar.gz annotations.tar.gz
 
 ## Train and test :computer:
 ```bash
-python src/preprocess.py
+python src/preprocess.py --cls_type [species, breed]
 python src/train.py
 python src/test.py
 ```
