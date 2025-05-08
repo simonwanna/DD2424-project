@@ -32,26 +32,22 @@ def unfreeze_last_blocks(model, l):
     for block in layers[-l:]:
         for param in block.parameters():
             param.requires_grad = True
-
-for l in range(1, 5):
-    model = resnet18(weights=ResNet18_Weights.DEFAULT)
-    model.fc = nn.Linear(model.fc.in_features, 37)
     
-    for param in model.parameters():
-        param.requires_grad = False
     for param in model.fc.parameters():
         param.requires_grad = True
-    unfreeze_last_blocks(model, l)
+    
+    return model.to(DEVICE)
 
-    model = model.to(DEVICE)
 
+weights = ResNet18_Weights.DEFAULT
+model = resnet18(weights=weights)
+model.fc = nn.Linear(model.fc.in_features, 37)  # change output to 2 classes
 
 criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(
-    filter(lambda p: p.requires_grad, model.parameters()), lr=LEARNING_RATE) # only use parameters that require grad
+# only use parameters that require grad
 
 
-def run_epoch(loader, phase='train'):
+def run_epoch(loader, phase='train', ):
     if phase == 'train':
         model.train()
     else:
@@ -88,18 +84,29 @@ if __name__ == '__main__':
     os.makedirs('checkpoints', exist_ok=True)
     best_val_acc = 0.0
     
-    for epoch in range(1, NUM_EPOCHS + 1):
-        train_loss, train_acc = run_epoch(train_loader, 'train')
-        val_loss, val_acc = run_epoch(val_loader, 'val')
+    for l in range(1, 5):
+        global optimizer
+        
+        
+        model = unfreeze_last_blocks(l)
+        
+        optimizer = torch.optim.Adam(
+            filter(lambda p: p.requires_grad, model.parameters()), lr=LEARNING_RATE)
+        
+        # update model...
+        
+        for epoch in range(1, NUM_EPOCHS + 1):
+            train_loss, train_acc = run_epoch(train_loader, 'train')
+            val_loss, val_acc = run_epoch(val_loader, 'val')
 
-        print(f"Epoch {epoch}/{NUM_EPOCHS}  "
-              f"Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}  "
-              f"Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}")
+            print(f"Epoch {epoch}/{NUM_EPOCHS}  "
+                f"Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}  "
+                f"Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}")
 
-        # save best model
-        if val_acc > best_val_acc:
-            best_val_acc = val_acc
-            torch.save(model.state_dict(), 'checkpoints/best_resnet18_finetuned.pth')
+            # save best model
+            if val_acc > best_val_acc:
+                best_val_acc = val_acc
+                torch.save(model.state_dict(), 'checkpoints/best_resnet18_finetuned.pth')
 
     print("\033[92m" + f"Training complete. Best val acc: {best_val_acc: .4f}" + "\033[0m")
  
