@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 
 DATA_DIR = 'data'
 BATCH_SIZE = 32
-NUM_EPOCHS = 5 # Set to 5 for fewer runs per experiment
+NUM_EPOCHS = 3 # Set to 5 for fewer runs per experiment
 LEARNING_RATE = 1e-4
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -28,6 +28,8 @@ val_loader   = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num
 def freeze_all_layers(model):
     for param in model.parameters():
         param.requires_grad = False
+    for param in model.fc.parameters():  # unfreeze final layer
+        param.requires_grad = True
     return model
 
 def unfreeze_last_blocks(model, l):
@@ -38,13 +40,14 @@ def unfreeze_last_blocks(model, l):
             param.requires_grad = True
     for param in model.fc.parameters():
         param.requires_grad = True
-    return model.to(DEVICE)
+    return model
 
 # Load pre-trained ResNet18 and modify final layer
 weights = ResNet18_Weights.DEFAULT
 model = resnet18(weights=weights)
+model.fc = nn.Linear(model.fc.in_features, 37)
 model = freeze_all_layers(model)
-model.fc = nn.Linear(model.fc.in_features, 37) 
+model = model.to(DEVICE)
 criterion = nn.CrossEntropyLoss()
 
 def run_epoch(loader, phase='train'):
@@ -80,8 +83,10 @@ if __name__ == '__main__':
     os.makedirs('checkpoints', exist_ok=True)
     best_val_acc = 0.0
     
-    for l in range(1,3):  # Unfreeze more layers progressively, change upper bound for deeper unfreeze
-        model = unfreeze_last_blocks(model, l) # Get model
+    for l in range(0, 2):  # Unfreeze more layers progressively, change upper bound for deeper unfreeze
+        if l != 0:
+            model = unfreeze_last_blocks(model, l) # Get model
+        
         optimizer = torch.optim.Adam(
             filter(lambda p: p.requires_grad, model.parameters()), lr=LEARNING_RATE) # optimizer for unfrozen model
         
@@ -93,6 +98,6 @@ if __name__ == '__main__':
                   f"Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}")
             if val_acc > best_val_acc:
                 best_val_acc = val_acc
-                torch.save(model.state_dict(), 'checkpoints/best_resnet18_finetuned.pth')
+                torch.save(model.state_dict(), 'checkpoints/best_resnet18_finetuned_breed.pth')
 
     print("\033[92m" + f"Training complete. Best val acc: {best_val_acc:.4f}" + "\033[0m")
