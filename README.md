@@ -20,9 +20,9 @@ rm images.tar.gz annotations.tar.gz
 ```
 
 ## Train and test :computer:
-run bash script: `bash preprocess.sh`, change --cls_type [species, breed]
-run training: `bash train.sh`, change path to train script 
-run testing: `bash test.sh`
+run bash script: `bash preprocess.sh`, change arguments in file
+run training: `bash train.sh`, change path/rguments in file
+run testing: `bash test.sh`, choose model in file
 ```
 
 ## Results :bar_chart:

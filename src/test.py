@@ -20,23 +20,25 @@ transform = transforms.Compose([
                          std=[0.229, 0.224, 0.225])
 ])
 
-test_dataset = ImageFolder(root=os.path.join(
-    DATA_DIR, 'test'), transform=transform)
-test_loader = DataLoader(
-    test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
+test_dataset = ImageFolder(root=os.path.join(DATA_DIR, 'test'), transform=transform)
+test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
 # model setup
-weights = ResNet18_Weights.DEFAULT
-model = resnet18(weights=weights)
-model.fc = nn.Linear(model.fc.in_features, NUM_CLASSES)
-model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
-model = model.to(DEVICE)
+def setup_model(model_path):
 
-criterion = nn.CrossEntropyLoss()
-accuracy_metric = torchmetrics.Accuracy(task="multiclass", num_classes=NUM_CLASSES).to(DEVICE)
+    weights = ResNet18_Weights.DEFAULT
+    model = resnet18(weights=weights)
+    model.fc = nn.Linear(model.fc.in_features, NUM_CLASSES)
+    model.load_state_dict(torch.load(model_path, map_location=DEVICE))
+    model = model.to(DEVICE)
+
+    criterion = nn.CrossEntropyLoss()
+    accuracy_metric = torchmetrics.Accuracy(task="multiclass", num_classes=NUM_CLASSES).to(DEVICE)
+    
+    return model, criterion, accuracy_metric
 
 
-def run_test_epoch(loader):
+def run_test_epoch(loader, model=None, criterion=None, accuracy_metric=None):
     accuracy_metric.reset()
     model.eval()
     total_loss = 0.0
@@ -66,9 +68,11 @@ if __name__ == "__main__":
                                    default='checkpoints/best_resnet18_finetuned_breed_s1_l=3.pth',
                                    help='Path to the model checkpoint')
     args = parser.parse_args()
-    MODEL_PATH = args.model_path
+    model_path = args.model_path
     
-    total_loss, num_samples = run_test_epoch(test_loader)
+    model, criterion, accuracy_metric = setup_model(model_path)
+    
+    total_loss, num_samples = run_test_epoch(test_loader, model, criterion, accuracy_metric)
     avg_loss = total_loss / num_samples
     accuracy = accuracy_metric.compute().item()
 
