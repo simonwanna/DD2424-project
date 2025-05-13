@@ -9,8 +9,9 @@ import torchmetrics
 
 
 DATA_DIR = 'data'
-MODEL_PATH = 'checkpoints/best_resnet18_finetuned.pth'
+MODEL_PATH = 'checkpoints/best_resnet18_finetuned_breed_s1_l=1.pth'
 BATCH_SIZE = 32
+NUM_CLASSES = 37
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 transform = transforms.Compose([
@@ -27,12 +28,12 @@ test_loader = DataLoader(
 # model setup
 weights = ResNet18_Weights.DEFAULT
 model = resnet18(weights=weights)
-model.fc = nn.Linear(model.fc.in_features, 2)
+model.fc = nn.Linear(model.fc.in_features, NUM_CLASSES)
 model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
 model = model.to(DEVICE)
 
 criterion = nn.CrossEntropyLoss()
-accuracy_metric = torchmetrics.Accuracy(task="multiclass", num_classes=2).to(DEVICE)
+accuracy_metric = torchmetrics.Accuracy(task="multiclass", num_classes=NUM_CLASSES).to(DEVICE)
 
 
 def run_test_epoch(loader):

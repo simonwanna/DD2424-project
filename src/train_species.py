@@ -94,7 +94,7 @@ if __name__ == '__main__':
         # save best model
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), 'checkpoints/best_resnet18_finetuned.pth')
+            torch.save(model.state_dict(), 'checkpoints/best_resnet18_finetuned_species.pth')
 
     print("\033[92m" + f"Training complete. Best val acc: {best_val_acc: .4f}" + "\033[0m")
  

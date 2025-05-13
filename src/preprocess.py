@@ -28,19 +28,14 @@ def get_labels(cls_type: str = 'species'):
     if cls_type == 'species':
         return {'1': 'cat', '2': 'dog'}
     elif cls_type == 'breed':
-        return {
-                '1': "Abyssinian",      '2': "Bengal",         '3': "Birman",           '4': "Bombay",
-                '5': "British_Shorthair", '6': "Egyptian_Mau",  '7': "Maine_Coon",       '8': "Persian",
-                '9': "Ragdoll",         '10': "Russian_Blue",  '11': "Siamese",         '12': "Sphynx",
-            
-                '13': "american_bulldog", '14': "american_pit_bull_terrier", '15': "basset_hound", '16': "beagle",
-                '17': "boxer",          '18': "chihuahua",     '19': "english_cocker_spaniel", '20': "english_setter",
-                '21': "german_shorthaired", '22': "great_pyrenees", '23': "havanese",       '24': "japanese_chin",
-                '25': "keeshond",       '26': "leonberger",    '27': "miniature_pinscher", '28': "newfoundland",
-                '29': "pomeranian",     '30': "pug",           '31': "saint_bernard",     '32': "samoyed",
-                '33': "scottish_terrier", '34': "shiba_inu",   '35': "staffordshire_bull_terrier", '36': "wheaten_terrier",
-                '37': "yorkshire_terrier"
-        }
+        return  {'1': 'Abyssinian', '2': 'american_bulldog', '3': 'american_pit_bull_terrier', '4': 'basset_hound', 
+                 '5': 'beagle', '6': 'Bengal', '7': 'Birman', '8': 'Bombay', '9': 'boxer', '10': 'British_Shorthair', 
+                 '11': 'chihuahua', '12': 'Egyptian_Mau', '13': 'english_cocker_spaniel', '14': 'english_setter', 
+                 '15': 'german_shorthaired', '16': 'great_pyrenees', '17': 'havanese', '18': 'japanese_chin', 
+                 '19': 'keeshond', '20': 'leonberger', '21': 'Maine_Coon', '22': 'miniature_pinscher', '23': 'newfoundland', 
+                 '24': 'Persian', '25': 'pomeranian', '26': 'pug', '27': 'Ragdoll', '28': 'Russian_Blue', 
+                 '29': 'saint_bernard', '30': 'samoyed', '31': 'scottish_terrier', '32': 'shiba_inu', '33': 'Siamese', 
+                 '34': 'Sphynx', '35': 'staffordshire_bull_terrier', '36': 'wheaten_terrier', '37': 'yorkshire_terrier'}
     else:
         raise ValueError(
             "Invalid classification type. Use 'species' or 'breed'.")
