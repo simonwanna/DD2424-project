@@ -6,10 +6,10 @@ from torchvision.models import resnet18, ResNet18_Weights
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
 import torchmetrics
+import argparse
 
 
 DATA_DIR = 'data'
-MODEL_PATH = 'checkpoints/best_resnet18_finetuned_breed_s1_l=1.pth'
 BATCH_SIZE = 32
 NUM_CLASSES = 37
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -61,6 +61,13 @@ def run_test_epoch(loader):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Test.')
+    cls_type = parser.add_argument('--model_path', type=str,
+                                   default='checkpoints/best_resnet18_finetuned_breed_s1_l=3.pth',
+                                   help='Path to the model checkpoint')
+    args = parser.parse_args()
+    MODEL_PATH = args.model_path
+    
     total_loss, num_samples = run_test_epoch(test_loader)
     avg_loss = total_loss / num_samples
     accuracy = accuracy_metric.compute().item()

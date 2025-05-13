@@ -7,10 +7,15 @@ from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
 
 
+# random seed for reproducibility
+torch.manual_seed(42)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
 DATA_DIR = 'data'
 BATCH_SIZE = 64
 NUM_EPOCHS = 4 # Set to 5 for fewer runs per experiment
-LEARNING_RATE = 5e-5
+LEARNING_RATE = 1e-5
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Normalise according to https://pytorch.org/vision/main/models/generated/torchvision.models.resnet18
