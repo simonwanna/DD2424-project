@@ -2,3 +2,6 @@ torchmetrics==1.7.1
 torchsummary==1.5.1
 tqdm
 wandb
+scikit-learn
+matplotlib
+seaborn
