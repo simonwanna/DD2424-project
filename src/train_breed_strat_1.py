@@ -4,6 +4,7 @@ import torch.nn as nn
 import argparse
 from torchvision import transforms
 from torchvision.models import resnet18, ResNet18_Weights
+from torchvision.models import resnet34, ResNet34_Weights
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
 
@@ -109,8 +110,8 @@ def main(args):
     train_dataset = ImageFolder(root=os.path.join(DATA_DIR, 'train'), transform=train_transform)
     val_dataset   = ImageFolder(root=os.path.join(DATA_DIR, 'val'),   transform=val_transform)
 
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,  num_workers=4)
-    val_loader   = DataLoader(val_dataset,   batch_size=args.batch_size, shuffle=True,  num_workers=4)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)
+    val_loader   = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4)
 
     os.makedirs('checkpoints', exist_ok=True)
 
@@ -118,8 +119,10 @@ def main(args):
         print(f"\033[93mUnfreezing {l} layers...\033[0m")
         best_val_acc = 0.0
 
-        weights = ResNet18_Weights.DEFAULT
-        model = resnet18(weights=weights)
+        weights = ResNet34_Weights.DEFAULT
+        model = resnet34(weights=weights)
+        # weights = ResNet18_Weights.DEFAULT
+        # model = resnet18(weights=weights)
         model.fc = nn.Linear(model.fc.in_features, 37)
         model = freeze_all_layers(model)
         model = model.to(DEVICE)
@@ -128,7 +131,7 @@ def main(args):
 
         criterion = nn.CrossEntropyLoss()
         
-        weight_decay = 1e-4 if args.L2_reg else 0.0
+        weight_decay = 1e-3 if args.L2_reg else 0.0
 
         if args.layer_wise_lr:
             param_groups = [
