@@ -184,9 +184,7 @@ def main(args):
     train_dataset = ImageFolder(root=os.path.join(DATA_DIR, 'train'), transform=train_transform)
     val_dataset   = ImageFolder(root=os.path.join(DATA_DIR, 'val'),   transform=val_transform)
 
-    # TODO: if imbalanced:, use only 20% of the images from any class that is of cat
-    # should be able to use weighted cross entropy to counteract for the imbalance
-    if args.imbalanced: # Corrected typo: imblanced -> imbalanced
+    if args.imbalanced:
         print("Using **imbalanced** dataset: reducing cat breed samples in training set.")
         
         CAT_BREED_NAMES = [
@@ -218,14 +216,11 @@ def main(args):
         for class_idx, class_samples in samples_by_class.items():
             class_name = train_dataset.classes[class_idx]
             if class_idx in cat_breed_indices:
-                random.shuffle(class_samples) # Shuffle for random selection
+                random.shuffle(class_samples) 
                 num_to_keep = int(len(class_samples) * 0.20)
                 new_samples.extend(class_samples[:num_to_keep])
-                # This print statement is already good for individual reduction logging
-                # print(f"  Reduced class '{class_name}' (cat breed) from {len(class_samples)} to {num_to_keep} samples.")
             else:
                 new_samples.extend(class_samples) # Keep all samples for non-cat (dog) breeds
-                # print(f"  Kept all {len(class_samples)} samples for class '{class_name}'.")
 
 
         if not new_samples:
@@ -251,10 +246,6 @@ def main(args):
                 reduction_info = f" (Reduced from {original_count})"
             print(f"Class '{class_name}' (ID: {class_idx}): {new_count} samples{reduction_info}")
 
-        if args.weighted_loss:
-            # Placeholder for weighted loss implementation
-            print("Weighted loss to be implemented.")
-            pass
 
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,  num_workers=4)
     val_loader   = DataLoader(val_dataset,   batch_size=args.batch_size, shuffle=True,  num_workers=4)
@@ -263,7 +254,14 @@ def main(args):
     
     weight_decay = 1e-4 if args.L2_reg else 0.0
     best_val_acc = 0.0
-    model, criterion = setup_model()
+    model, _ = setup_model()
+    if args.weighted_loss:
+        counts = np.bincount(train_dataset.targets, minlength=len(train_dataset.classes))
+        weights = torch.tensor(counts.sum()/(len(counts)*counts), dtype=torch.float32, device=DEVICE)
+        criterion = nn.CrossEntropyLoss(weight=weights)
+    else:
+        criterion = nn.CrossEntropyLoss()
+    
     for l in range(0, 3):  # Unfreeze more layers progressively, change upper bound for deeper unfreeze
         model = unfreeze_last_blocks(model, l, finetune_bn_layers=args.bn_layers)
         
@@ -281,7 +279,6 @@ def main(args):
 
         for epoch in range(1, args.num_epochs + 1):
             train_loss, train_acc = run_epoch(train_loader, 'train', model, criterion, optimizer)
-            # val_loss, val_acc = run_epoch(val_loader, 'val', model, criterion)
             val_loss, val_acc, val_preds, val_labels = run_epoch(val_loader,   'val',   model, criterion)
             print(f"Epoch {epoch}/{args.num_epochs}  "
                   f"Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}  "

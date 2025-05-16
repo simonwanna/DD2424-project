@@ -109,8 +109,6 @@ def main(args):
     train_dataset = ImageFolder(root=os.path.join(DATA_DIR, 'train'), transform=train_transform)
     val_dataset   = ImageFolder(root=os.path.join(DATA_DIR, 'val'),   transform=val_transform)
 
-    # TODO: if imbalanced:
-
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,  num_workers=4)
     val_loader   = DataLoader(val_dataset,   batch_size=args.batch_size, shuffle=True,  num_workers=4)
 

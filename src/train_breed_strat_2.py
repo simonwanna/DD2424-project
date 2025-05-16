@@ -122,14 +122,12 @@ def main(args):
     train_dataset = ImageFolder(root=os.path.join(DATA_DIR, 'train'), transform=train_transform)
     val_dataset   = ImageFolder(root=os.path.join(DATA_DIR, 'val'),   transform=val_transform)
 
-    # TODO: if imbalanced:
-
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,  num_workers=4)
     val_loader   = DataLoader(val_dataset,   batch_size=args.batch_size, shuffle=True,  num_workers=4)
 
     os.makedirs('checkpoints', exist_ok=True)
     
-    weight_decay = 1e-4 if args.L2_reg else 0.0
+    weight_decay = 1e-2 if args.L2_reg else 0.0
     best_val_acc = 0.0
     model, criterion = setup_model()
     for l in range(0, 3):  # Unfreeze more layers progressively, change upper bound for deeper unfreeze
