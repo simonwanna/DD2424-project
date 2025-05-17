@@ -285,7 +285,7 @@ def main(args):
                   f"Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}")
             if val_acc > best_val_acc:
                 best_val_acc = val_acc
-                torch.save(model.state_dict(), f'checkpoints/best_breed_s2_l={l}_AUG:{args.augment}_LWLR:{args.layer_wise_lr}_L2:{args.L2_reg}_BN:{args.bn_layers}.pth')
+                torch.save(model.state_dict(), f'checkpoints/best_breed_s2_IMBALLANCED_l={l}_AUG:{args.augment}_LWLR:{args.layer_wise_lr}_L2:{args.L2_reg}_BN:{args.bn_layers}.pth')
         
     plot_confusion_matrix_heatmap(val_labels.numpy(), val_preds.numpy(), train_dataset.classes)
     print("\033[92m" + f"Training complete. Best val acc: {best_val_acc:.4f}" + "\033[0m")
@@ -296,7 +296,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Choose data augmentation mode.")
     parser.add_argument('--lr', type=float, default=1e-5,
                         help="Base learning rate for the model.")
-    parser.add_argument('--num_epochs', type=int, default=5,
+    parser.add_argument('--num_epochs', type=int, default=6,
                         help="Number of epochs to train the model.")
     parser.add_argument('--batch_size', type=int, default=64,
                         help="Batch size for training and validation.")

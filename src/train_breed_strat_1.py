@@ -7,6 +7,7 @@ from torchvision.models import resnet18, ResNet18_Weights
 from torchvision.models import resnet34, ResNet34_Weights
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
+import datetime
 
 
 # random seed for reproducibility
@@ -145,6 +146,8 @@ def main(args):
             optimizer = torch.optim.Adam(
                 filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr, weight_decay=weight_decay)
 
+        start = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"Start time: {start}")
         for epoch in range(1, args.num_epochs + 1):
             train_loss, train_acc = run_epoch(train_loader, 'train', model, criterion, optimizer)
             val_loss, val_acc = run_epoch(val_loader, 'val', model, criterion)
@@ -157,7 +160,11 @@ def main(args):
                 best_val_acc = val_acc
                 torch.save(model.state_dict(), f'checkpoints/best_breed_s1_l={l}_AUG:{args.augment}_LWLR:{args.layer_wise_lr}_L2:{args.L2_reg}_BN:{args.bn_layers}.pth')
                 print(f"\033[92mSaved best model for l={l} with val acc: {val_acc:.4f}\033[0m")
-
+        end = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        time_diff = datetime.datetime.strptime(end, "%Y-%m-%d %H:%M:%S") - datetime.datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+        print(f"End time: {end}")
+        print(f"Time taken for l={l}: {time_diff}")
+        
     print(f"\033[92mTraining complete. Best val acc: {best_val_acc:.4f}\033[0m")
     
 
@@ -165,7 +172,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Choose data augmentation mode.")
     parser.add_argument('--lr', type=float, default=1e-5,
                         help="Base learning rate for the model.")
-    parser.add_argument('--num_epochs', type=int, default=10,
+    parser.add_argument('--num_epochs', type=int, default=18,
                         help="Number of epochs to train the model.")
     parser.add_argument('--batch_size', type=int, default=64,
                         help="Batch size for training and validation.")

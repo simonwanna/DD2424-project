@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 from torchvision import transforms
 from torchvision.models import resnet18, ResNet18_Weights
+from torchvision.models import resnet34, ResNet34_Weights
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
 import torchmetrics
@@ -26,8 +27,10 @@ test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num
 # model setup
 def setup_model(model_path):
 
-    weights = ResNet18_Weights.DEFAULT
-    model = resnet18(weights=weights)
+    # weights = ResNet18_Weights.DEFAULT
+    # model = resnet18(weights=weights)
+    weights = ResNet34_Weights.DEFAULT
+    model = resnet34(weights=weights)
     model.fc = nn.Linear(model.fc.in_features, NUM_CLASSES)
     model.load_state_dict(torch.load(model_path, map_location=DEVICE))
     model = model.to(DEVICE)

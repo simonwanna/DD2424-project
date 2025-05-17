@@ -14,6 +14,7 @@ import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
+import datetime
 
 # random seed for reproducibility
 # torch.manual_seed(42)
@@ -228,9 +229,12 @@ def main(args):
 
     os.makedirs('checkpoints', exist_ok=True)
     
-    weight_decay = 0.1 if args.L2_reg else 0.0
+    weight_decay = 0.01 if args.L2_reg else 0.0
     best_val_acc = 0.0
     model, criterion = setup_model()
+    
+    start = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"Training started at {start}")
     for l in range(0, 3):  # Unfreeze more layers progressively, change upper bound for deeper unfreeze
 
         model = unfreeze_last_blocks(model, l, finetune_bn_layers=args.bn_layers)
@@ -260,6 +264,11 @@ def main(args):
                 best_val_acc = val_acc
                 torch.save(model.state_dict(), f'checkpoints/best_breed_s2_l={l}_AUG:{args.augment}_LWLR:{args.layer_wise_lr}_L2:{args.L2_reg}_BN:{args.bn_layers}.pth')
 
+    end = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    time_diff = datetime.datetime.strptime(end, "%Y-%m-%d %H:%M:%S") - datetime.datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+    print(f"End time: {end}")
+    print(f"Time taken for l={l}: {time_diff}")
+    
     print("\033[92m" + f"Training complete. Best val acc: {best_val_acc:.4f}" + "\033[0m")
 
 
@@ -268,7 +277,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Choose data augmentation mode.")
     parser.add_argument('--lr', type=float, default=1e-5,
                         help="Base learning rate for the model.")
-    parser.add_argument('--num_epochs', type=int, default=5,
+    parser.add_argument('--num_epochs', type=int, default=6,
                         help="Number of epochs to train the model.")
     parser.add_argument('--batch_size', type=int, default=64,
                         help="Batch size for training and validation.")
