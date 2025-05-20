@@ -128,6 +128,30 @@ def run_epoch(loader, phase='train', model=None, criterion=None, optimizer=None)
         return epoch_loss, epoch_acc.item() if isinstance(epoch_acc, torch.Tensor) else epoch_acc
 
 
+def plot_cat_confusion_matrix(val_labels, val_preds, class_names, cat_breed_names):
+    """
+    Creates a confusion matrix for cat breeds only
+    """
+    cat_indices = [i for i, name in enumerate(class_names) if name in cat_breed_names]
+    cat_mask = np.isin(val_labels, cat_indices)
+    cat_labels = val_labels[cat_mask]
+    cat_preds = val_preds[cat_mask]
+    label_mapping = {old_idx: new_idx for new_idx, old_idx in enumerate(cat_indices)}
+    remapped_labels = np.array([label_mapping[label] for label in cat_labels])
+    remapped_preds = np.array([label_mapping[pred] if pred in label_mapping else -1 for pred in cat_preds])
+    valid_mask = remapped_preds >= 0
+    remapped_labels = remapped_labels[valid_mask]
+    remapped_preds = remapped_preds[valid_mask]
+    cat_class_names = [class_names[i] for i in cat_indices]
+    plot_confusion_matrix_heatmap(
+        remapped_labels, 
+        remapped_preds, 
+        cat_class_names, 
+        output_filename='cat_confusion_matrix_heatmap.png'
+    )
+    print("Cat-only confusion matrix saved to cat_confusion_matrix_heatmap.png")
+
+
 def plot_confusion_matrix_heatmap(y_true, y_pred, class_names, normalize='true', output_filename='confusion_matrix_heatmap.png'):
     """
     Computes and plots a confusion matrix heatmap.
@@ -288,6 +312,7 @@ def main(args):
                 torch.save(model.state_dict(), f'checkpoints/best_breed_s2_IMBALLANCED_l={l}_AUG:{args.augment}_LWLR:{args.layer_wise_lr}_L2:{args.L2_reg}_BN:{args.bn_layers}.pth')
         
     plot_confusion_matrix_heatmap(val_labels.numpy(), val_preds.numpy(), train_dataset.classes)
+    plot_cat_confusion_matrix(val_labels.numpy(), val_preds.numpy(), train_dataset.classes, CAT_BREED_NAMES)
     print("\033[92m" + f"Training complete. Best val acc: {best_val_acc:.4f}" + "\033[0m")
 
 

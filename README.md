@@ -1,5 +1,7 @@
 # DD2424-project - Transfer Learning
-Course project in Deep Learning (DD2424) at KTH Royal Institute of Technology.
+This repo contains a course project in Deep Learning (DD2424) at KTH Royal Institute of Technology. The goal was to explore trainsfer learning on image classification tasks.
+
+![TorchCam](assets/torchcam-ex.png)
 
 ## Dataset :cat: :dog:
 Project is using the [Oxford Pets dataset](https://www.robots.ox.ac.uk/~vgg/data/pets/). \
@@ -23,8 +25,12 @@ rm images.tar.gz annotations.tar.gz
 run bash script: `bash preprocess.sh`, change arguments in file
 run training: `bash train.sh`, change path/rguments in file
 run testing: `bash test.sh`, choose model in file
-```
 
 ## Results :bar_chart:
-- val: 0.9864
-- test: 0.9810
+Best binary classification of cat vs dog.
+- val: 0.986
+- test: 0.989
+
+Best multiclass classification of 37 breed classes.
+- val: 0.916
+- test: 0.925

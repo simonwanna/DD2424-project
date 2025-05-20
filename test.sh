@@ -1,1 +1,5 @@
-python src/test.py --model_path /home/x_simwa/project/code/extra/DD2424-project/checkpoints/best_resnet18_finetuned_breed.pth 
+python src/test.py --model_path path/to/model
+
+# Possible arguments:
+# --model_path X        [default: None]
+# --cam                 [default: False]
